@@ -25,12 +25,17 @@ sigma = u'_-‾'
 A = permutations(sigma)
 print('A = '+' | '.join(A))
 print('|A| = ' + str(len(A)))
+print('')
 
 # system B
+B = []
 for design in A:
     for i in range(3):
         for j in range(2):
-
+            B.append(str(i+1)+design[0]+str(j+1)+design[1]+"1"+design[2])
+print('B = '+' | '.join(B))
+print('|B| = ' + str(len(B)))
+print('')
 
 # system C
 
@@ -39,6 +44,7 @@ for note in sigma:
     C += unique(permutations(sigma + note))
 print('C = '+' | '.join(C))
 print('|C| = ' + str(len(C)))
+print('')
 
 def reduce(design):
     return unique(design, t=lambda x: "".join(x))
