@@ -39,14 +39,20 @@ print('')
 
 def density_pattern(d):
     ret = ''
-    remaining = []
+    remaining = {}
     for note in [d[i:i+2] for i in range(0, len(d), 2)]:
-        for i in range(len(remaining)):
-            if remaining[i] > 0:
-                remaining[i] -= 1
-        di = note[0]
-        remaining.append(int(di))
-        ret += str(len([x for x in remaining if x > 0]))
+        for k in remaining:
+            if remaining[k] > 0:
+                remaining[k] -= 1
+        duration = int(note[0])
+        height = note[1]
+        # simultaneous note with the same height
+        if remaining.get(height) > 0:
+            #print('simul '+d)
+            return None
+
+        remaining[height] = duration
+        ret += str(len([k for k in remaining if remaining[k] > 0]))
     return ret
 
 count = {}
@@ -77,11 +83,22 @@ for design in C:
 
 D = []
 
+def check_d(d):
+    return density_pattern(d) is not None   
+
 for design in C:
+    candidates = []
     for i in range(4):
         for j in range(3):
             for k in range(2):
-                D.append(str(i+1)+design[0]+str(j+1)+design[1]+str(k+1)+design[2]+"1"+design[3])
+                candidate = str(i+1)+design[0]+str(j+1)+design[1]+str(k+1)+design[2]+"1"+design[3]
+                candidates.append(candidate)
+    s = 0
+    for candidate in candidates:
+        if check_d(candidate):
+            s += 1
+            D.append(candidate)
+    print('d '+design+' -> ' + str(s) + ' out of '+str(len(candidates)))
 print('D = '+' | '.join(D))
 print('|D| = ' + str(len(D)))
 print('')
@@ -91,6 +108,7 @@ print('D density patterns:')
 for design in D:
     density = density_pattern(design)
     if density is None:
+        print('DENSITY NONE FOR '+design)
         continue
     print(design + ' -> ' + density)
     count[density] = count.get(density, 0) + 1
