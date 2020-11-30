@@ -37,6 +37,24 @@ print('B = '+' | '.join(B))
 print('|B| = ' + str(len(B)))
 print('')
 
+def density_pattern(d):
+    l1 = int(d[0])
+    l2 = int(d[2])
+    d1 = 1
+    d2 = 1 if l1 == 1 else 2
+    d3 = 1 + (1 if l1 == 3 else 0) + (1 if l2 == 2 else 0)
+    return str(d1)+str(d2)+str(d3)
+
+count = {}
+print('Density patterns:')
+for design in B:
+    density = density_pattern(design)
+    print(design + ' -> ' + density)
+    count[density] = count.get(density, 0) + 1
+
+for k in count:
+    print(k + ' -> '+str(count[k])+' times.')
+
 # system C
 
 C = []
@@ -49,6 +67,6 @@ print('')
 def reduce(design):
     return unique(design, t=lambda x: "".join(x))
 for design in C:
-    print(design +' -> '+ reduce(design))
+    print(design + ' -> ' + reduce(design))
 
 # system D
