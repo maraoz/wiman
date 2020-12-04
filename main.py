@@ -26,6 +26,7 @@ A = permutations(sigma)
 print('A = '+' | '.join(A))
 print('|A| = ' + str(len(A)))
 print('')
+#raw_input()
 
 # system B
 B = []
@@ -37,6 +38,7 @@ print('B = '+' | '.join(B))
 print('|B| = ' + str(len(B)))
 print('')
 
+#raw_input()
 def density_pattern(d):
     ret = ''
     remaining = {}
@@ -65,6 +67,7 @@ for design in B:
 for k in count:
     print(k + ' -> '+str(count[k])+' times.')
 
+#raw_input()
 # system C
 
 C = []
@@ -73,12 +76,15 @@ for note in sigma:
 print('C = '+' | '.join(C))
 print('|C| = ' + str(len(C)))
 print('')
+#raw_input()
 
+print('C reduction to A')
 def reduce(design):
     return unique(design, t=lambda x: "".join(x))
 for design in C:
     print(design + ' -> ' + reduce(design))
 
+#raw_input()
 # system D
 
 D = []
@@ -86,23 +92,30 @@ D = []
 def check_d(d):
     return density_pattern(d) is not None   
 
-for design in C:
-    candidates = []
-    for i in range(4):
-        for j in range(3):
-            for k in range(2):
+candidates = []
+for i in range(4):
+    for j in range(3):
+        for k in range(2):
+            count = 0
+            for design in C:
                 candidate = str(i+1)+design[0]+str(j+1)+design[1]+str(k+1)+design[2]+"1"+design[3]
                 candidates.append(candidate)
-    s = 0
-    for candidate in candidates:
-        if check_d(candidate):
-            s += 1
-            D.append(candidate)
-    print('d '+design+' -> ' + str(s) + ' out of '+str(len(candidates)))
+                if check_d(candidate):
+                    count += 1
+                    print(candidate)
+            print(i+1, j+1, k+1, 1, "count", count)
+s = 0
+for candidate in candidates:
+    if check_d(candidate):
+        s += 1
+        D.append(candidate)
+#print('d '+design+'    > ' + str(s) + ' out of '+str(len(candidates)))
+#raw_input()
 print('D = '+' | '.join(D))
 print('|D| = ' + str(len(D)))
 print('')
 
+#raw_input()
 count = {}
 print('D density patterns:')
 for design in D:
@@ -116,3 +129,4 @@ for design in D:
 for k in count:
     print(k + ' -> '+str(count[k])+' times.')
 
+#raw_input()
