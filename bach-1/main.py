@@ -46,6 +46,7 @@ def chromatic_to_tonal(note):
 n = 0
 #colors = [[255, 50, 50], [50, 50, 255], [255,255,255]]
 colors = [[255, 150, 150], [150, 150, 255], [255,255,255]]
+alt_colors = [[255, 150, 220], [150, 255, 220], [255, 255, 255]]
 QUANTA = 48 #smallest note duration
 OFF_VALUE = 250
 OFF_COLOR = [OFF_VALUE, OFF_VALUE, OFF_VALUE]
@@ -56,7 +57,7 @@ BORDER = 1
 BORDER_COLOR = [255,255,255]
 length = int(mid.length*1000//(QUANTA)/2)
 print(length, "total duration)")
-padding = 100
+padding = 32
 WIDTH = (length+padding)*scale
 data = numpy.zeros((HEIGHT, WIDTH, 3), dtype=numpy.uint8) + OFF_VALUE
 
@@ -77,6 +78,7 @@ for i, track in enumerate(mid.tracks):
     x = 0
     color = colors[i-1]
     border_color = [int(color[0]*2/4 + 2*BORDER_COLOR[0]/4), int(color[1]*2/4 + 2*BORDER_COLOR[1]/4), int(color[2]*2/4 + 2*BORDER_COLOR[2]/4)]
+    alt_color = alt_colors[i-1]
     for msg in track:
         #time.sleep(msg.time/1000.0)
         if not msg.is_meta:
@@ -89,8 +91,11 @@ for i, track in enumerate(mid.tracks):
                 sys.exit(1)
             duration = msg.time//QUANTA
             if msg.type == 'note_off':
-                paint = border_color
                 converted_note = chromatic_to_tonal(msg.note)
+                paint = border_color
+                if (simplify(msg.note) != msg.note):
+                    # alteration
+                    paint = alt_color
                 y = (NOTES-converted_note)
                 data[y*scale:(y+1)*scale, x*scale:(x+duration)*scale] = paint
                 if BORDER:
