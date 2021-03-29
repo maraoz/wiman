@@ -50,7 +50,7 @@ QUANTA = 48 #smallest note duration
 OFF_VALUE = 250
 OFF_COLOR = [OFF_VALUE, OFF_VALUE, OFF_VALUE]
 scale = 16
-NOTES = 7*8+5
+NOTES = 7*8+5 # 127 for chromatic
 HEIGHT = NOTES*scale
 BORDER = 1
 BORDER_COLOR = [255,255,255]
@@ -61,10 +61,11 @@ WIDTH = (length+padding)*scale
 data = numpy.zeros((HEIGHT, WIDTH, 3), dtype=numpy.uint8) + OFF_VALUE
 
 GRID_COLOR = [220,220,220]
+STRONG_COLOR = [180,180, 180]
 for x in range(length+padding):
-    data[0:HEIGHT, x*scale] = GRID_COLOR 
+    data[0:HEIGHT, x*scale] = GRID_COLOR if x%16!=0 else STRONG_COLOR
 for y in range(NOTES):
-    data[y*scale, 0:WIDTH-2] = GRID_COLOR 
+    data[y*scale, 0:WIDTH] = GRID_COLOR if (y-6)%7!=0 else STRONG_COLOR
     pass
         #data[(y+1)*scale-BORDER:(y+1)*scale, x*scale:(x+duration)*scale] = color
         #for t in range(duration):
