@@ -30,6 +30,18 @@ def simplify(note):
     if chroma == 10: chroma = 11 # Bb -> B
     return (note//12)*12 + chroma
 
+def chromatic_to_tonal(note):
+    chroma = note % 12
+    octave = note // 12
+    tone = None
+    if chroma <= 1: tone = 0 # C, C#
+    elif chroma <= 3: tone = 1 # D, D#
+    elif chroma == 4: tone = 2 # E
+    elif chroma <= 6: tone = 3 # F, F#
+    elif chroma <= 8: tone = 4 # G, G#
+    elif chroma == 9: tone = 5 # A
+    elif chroma <= 11: tone = 6 # Bb, B
+    return octave*7+tone
 
 n = 0
 #colors = [[255, 50, 50], [50, 50, 255], [255,255,255]]
@@ -38,7 +50,7 @@ QUANTA = 48 #smallest note duration
 OFF_VALUE = 250
 OFF_COLOR = [OFF_VALUE, OFF_VALUE, OFF_VALUE]
 scale = 16
-NOTES = 128
+NOTES = 7*8+5
 HEIGHT = NOTES*scale
 BORDER = 1
 BORDER_COLOR = [255,255,255]
@@ -77,7 +89,8 @@ for i, track in enumerate(mid.tracks):
             duration = msg.time//QUANTA
             if msg.type == 'note_off':
                 paint = border_color
-                y = (128-msg.note)
+                converted_note = chromatic_to_tonal(msg.note)
+                y = (NOTES-converted_note)
                 data[y*scale:(y+1)*scale, x*scale:(x+duration)*scale] = paint
                 if BORDER:
                     data[y*scale:y*scale+BORDER, x*scale:(x+duration)*scale] = color
@@ -93,9 +106,9 @@ image = Image.fromarray(data)
 image.save("image-"+str(n)+".png")
 
 
+midi_file = './bach-invention-01.mid'
 def play_music(music_file):
     import pygame
-    midi_file = './bach-invention-01.mid'
     freq = 44100    # audio CD quality
     bitsize = -16   # unsigned 16 bit
     channels = 2    # 1 is mono, 2 is stereo
@@ -117,7 +130,7 @@ def play_music(music_file):
 
 try:
     pass
-    #play_music(midi_file)
+    play_music(midi_file)
 except KeyboardInterrupt:
     # if user hits Ctrl/C then exit
     # (works only in console mode)
