@@ -78,7 +78,7 @@ for i, track in enumerate(mid.tracks):
     x = 0
     color = colors[i-1]
     border_color = [int(color[0]*2/4 + 2*BORDER_COLOR[0]/4), int(color[1]*2/4 + 2*BORDER_COLOR[1]/4), int(color[2]*2/4 + 2*BORDER_COLOR[2]/4)]
-    alt_color = alt_colors[i-1]
+    alt_color = color
     for msg in track:
         #time.sleep(msg.time/1000.0)
         if not msg.is_meta:
