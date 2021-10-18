@@ -9,8 +9,12 @@ import math
 import numpy
 from PIL import Image
 
+midi_file = './bach-invention-04.mid'
+msg_type = 'note_off'
+QUANTA = 3*32 #smallest note duration
+COMPASS_IN_QUANTA = 6
 
-mid = MidiFile('bach-invention-01.mid')
+mid = MidiFile(midi_file)
 
 NAMES=['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
@@ -27,7 +31,7 @@ def simplify(note):
     if chroma == 3: chroma = 2 # D# ->D
     if chroma == 6: chroma = 5 # F# -> F
     if chroma == 8: chroma = 7 # G# -> G
-    if chroma == 10: chroma = 11 # Bb -> B
+    if chroma == 11: chroma = 10 # B -> Bb
     return (note//12)*12 + chroma
 
 def chromatic_to_tonal(note):
@@ -47,7 +51,6 @@ n = 0
 #colors = [[255, 50, 50], [50, 50, 255], [255,255,255]]
 colors = [[255, 150, 150], [150, 150, 255], [255,255,255]]
 alt_colors = [[255, 150, 220], [150, 255, 220], [255, 255, 255]]
-QUANTA = 48 #smallest note duration
 OFF_VALUE = 250
 OFF_COLOR = [OFF_VALUE, OFF_VALUE, OFF_VALUE]
 scale = 16
@@ -57,14 +60,14 @@ BORDER = 1
 BORDER_COLOR = [255,255,255]
 length = int(mid.length*1000//(QUANTA)/2)
 print(length, "total duration)")
-padding = 32
+padding = 64
 WIDTH = (length+padding)*scale
 data = numpy.zeros((HEIGHT, WIDTH, 3), dtype=numpy.uint8) + OFF_VALUE
 
 GRID_COLOR = [220,220,220]
 STRONG_COLOR = [180,180, 180]
 for x in range(length+padding):
-    data[0:HEIGHT, x*scale] = GRID_COLOR if x%32!=0 else STRONG_COLOR
+    data[0:HEIGHT, x*scale] = GRID_COLOR if x%(COMPASS_IN_QUANTA)!=0 else STRONG_COLOR
 for y in range(NOTES):
     data[y*scale, 0:WIDTH] = GRID_COLOR if (y-6)%7!=0 else STRONG_COLOR
 
@@ -75,17 +78,21 @@ for i, track in enumerate(mid.tracks):
     border_color = [int(color[0]*2/4 + 2*BORDER_COLOR[0]/4), int(color[1]*2/4 + 2*BORDER_COLOR[1]/4), int(color[2]*2/4 + 2*BORDER_COLOR[2]/4)]
     alt_color = color
     for msg in track:
+        
         #time.sleep(msg.time/1000.0)
         if not msg.is_meta:
             n += 1
-            if (msg.type=='note_off'):
+            
+            if (msg.type==msg_type):
                 pass
-                print(track.name, msg.type, note_name(msg.note), note_name(simplify(msg.note)), msg.time/QUANTA)
+                #print(track.name, msg.type, note_name(msg.note), note_name(simplify(msg.note)), msg.time//QUANTA)
+
             if msg.time % QUANTA != 0:
-                print("weird note time")
-                sys.exit(1)
-            duration = msg.time//QUANTA
-            if msg.type == 'note_off':
+                print("weird note time", msg.time, msg)
+            
+            duration = (msg.time//QUANTA)
+            
+            if msg.type == msg_type:
                 converted_note = chromatic_to_tonal(msg.note)
                 paint = border_color
                 if (simplify(msg.note) != msg.note):
@@ -102,12 +109,12 @@ for i, track in enumerate(mid.tracks):
                     pass
             x += duration
             #image = Image.fromarray(data)
-            #image.save("image-"+str(n)+".png")
+            #image.save(midi_file + "-image-"+str(n)+".png")
 image = Image.fromarray(data)
-image.save("image-"+str(n)+".png")
+image.save(midi_file + "-image-"+str(n)+".png")
 
 
-midi_file = './bach-invention-01.mid'
+
 def play_music(music_file):
     import pygame
     freq = 44100    # audio CD quality
@@ -131,7 +138,7 @@ def play_music(music_file):
 
 try:
     pass
-    play_music(midi_file)
+    #play_music(midi_file)
 except KeyboardInterrupt:
     # if user hits Ctrl/C then exit
     # (works only in console mode)
